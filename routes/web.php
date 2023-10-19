@@ -17,6 +17,8 @@ Route::get('/', function () {
     return view('home');
 });
 
+Route::view('users','users.showAll')->name('users.all');
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
