@@ -18,6 +18,7 @@ Route::get('/', function () {
 });
 
 Route::view('users','users.showAll')->name('users.all');
+Route::view('game','game.show')->name('game.show');
 
 Auth::routes();
 
