@@ -2,6 +2,7 @@
 
 @push('styles')
     <style type="text/css">
+
     </style>
 @endpush
 
@@ -22,8 +23,6 @@
                                             class="list-unstyled overflow-auto"
                                             style="height: 45vh"
                                         >
-                                            <li>Test1: Hello</li>
-                                            <li>Test2: Hi there</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -45,8 +44,6 @@
                                     class="list-unstyled overflow-auto text-info"
                                     style="height: 45vh"
                                 >
-                                    <li>Test1</li>
-                                    <li>Test2</li>
                                 </ul>
                             </div>
                         </div>
@@ -57,7 +54,58 @@
     </div>
 @endsection
 
-@push('scripts')
-    <script>
-    </script>
-@endpush
+<script type="module">
+    window.onload = function () {
+        const usersElement = document.getElementById('users');
+        const messagesElement = document.getElementById('messages');
+
+        Echo.join('chat')
+            .here((users) => {
+                users.forEach((user, index) => {
+                    let element = document.createElement('li');
+
+                    element.setAttribute('id', user.id);
+                    element.innerText = user.name;
+
+                    usersElement.appendChild(element);
+                });
+            })
+            .joining((user) => {
+                let element = document.createElement('li');
+
+                element.setAttribute('id', user.id);
+                element.innerText = user.name;
+
+                usersElement.appendChild(element);
+            })
+            .leaving((user) => {
+                const element = document.getElementById(user.id);
+                element.parentNode.removeChild(element);
+            })
+            .listen('MessageSent', (e) => {
+                let element = document.createElement('li');
+
+                element.innerText = e.user.name + ': ' + e.message;
+
+                messagesElement.appendChild(element);
+            });
+    }
+</script>
+
+<script type="module">
+
+        const messageElement = document.getElementById('message');
+        const sendElement = document.getElementById('send');
+
+        sendElement.addEventListener('click', (e) => {
+            e.preventDefault();
+
+
+            window.axios.post('/chat/message', {
+                message: messageElement.value,
+            });
+
+            messageElement.value = '';
+        });
+
+</script>
