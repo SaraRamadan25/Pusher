@@ -58,7 +58,7 @@
 @endsection
 
 @push('scripts')
-    <script >
+    <script>
         const circleElement = document.getElementById('circle');
         const timerElement = document.getElementById('timer');
         const winnerElement = document.getElementById('winner');

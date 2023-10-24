@@ -2,7 +2,9 @@
 
 @push('styles')
     <style type="text/css">
-
+        #users > li {
+            cursor: pointer;
+        }
     </style>
 @endpush
 
@@ -18,12 +20,7 @@
                             <div class="col-10">
                                 <div class="row">
                                     <div class="col-12 border rounded-lg p-3">
-                                        <ul
-                                            id="messages"
-                                            class="list-unstyled overflow-auto"
-                                            style="height: 45vh"
-                                        >
-                                        </ul>
+                                        <ul id="messages" class="list-unstyled overflow-auto" style="height: 45vh"></ul>
                                     </div>
                                 </div>
                                 <form>
@@ -39,11 +36,7 @@
                             </div>
                             <div class="col-2">
                                 <p><strong>Online Now</strong></p>
-                                <ul
-                                    id="users"
-                                    class="list-unstyled overflow-auto text-info"
-                                    style="height: 45vh"
-                                >
+                                <ul id="users" class="list-unstyled overflow-auto text-info" style="height: 45vh">
                                 </ul>
                             </div>
                         </div>
@@ -67,6 +60,8 @@
                     element.setAttribute('id', user.id);
                     element.innerText = user.name;
 
+                    element.onclick = () => greetUser(user.id);
+
                     usersElement.appendChild(element);
                 });
             })
@@ -75,6 +70,8 @@
 
                 element.setAttribute('id', user.id);
                 element.innerText = user.name;
+
+                element.onclick = () => greetUser(user.id);
 
                 usersElement.appendChild(element);
             })
@@ -93,19 +90,22 @@
 </script>
 
 <script type="module">
+    const messageElement = document.getElementById('message');
+    const sendElement = document.getElementById('send');
 
-        const messageElement = document.getElementById('message');
-        const sendElement = document.getElementById('send');
+    sendElement.addEventListener('click', (e) => {
+        e.preventDefault();
 
-        sendElement.addEventListener('click', (e) => {
-            e.preventDefault();
-
-
-            window.axios.post('/chat/message', {
-                message: messageElement.value,
-            });
-
-            messageElement.value = '';
+        window.axios.post('/chat/message', {
+            message: messageElement.value,
         });
 
+        messageElement.value = '';
+    });
+</script>
+
+<script>
+    function greetUser(id) {
+        window.axios.post('/chat/greet/' + id);
+    }
 </script>
