@@ -4,6 +4,7 @@
     <style type="text/css">
         #users > li {
             cursor: pointer;
+            color: red;
         }
     </style>
 @endpush
@@ -57,14 +58,24 @@
 @endsection
 
 <script type="module">
-    window.onload = function () {
-        const usersElement = document.getElementById('users');
-        const messagesElement = document.getElementById('messages');
+    const usersElement = document.getElementById('users');
+    const messagesElement = document.getElementById('messages');
 
+    function greetUser(id) {
+        window.axios.post('/chat/greet/' + id);
+    }
+
+    function appendMessage(message) {
+        const element = document.createElement('li');
+        element.innerText = message;
+        messagesElement.appendChild(element);
+    }
+
+    window.onload = function () {
         Echo.join('chat')
             .here((users) => {
-                users.forEach((user, index) => {
-                    let element = document.createElement('li');
+                users.forEach((user) => {
+                    const element = document.createElement('li');
                     element.setAttribute('id', user.id);
                     element.innerText = user.name;
 
@@ -76,7 +87,7 @@
                 });
             })
             .joining((user) => {
-                let element = document.createElement('li');
+                const element = document.createElement('li');
                 element.setAttribute('id', user.id);
                 element.innerText = user.name;
 
@@ -88,12 +99,12 @@
             })
             .leaving((user) => {
                 const element = document.getElementById(user.id);
-                element.parentNode.removeChild(element);
+                if (element) {
+                    element.parentNode.removeChild(element);
+                }
             })
             .listen('MessageSent', (e) => {
-                let element = document.createElement('li');
-                element.innerText = e.user.name + ': ' + e.message;
-                messagesElement.appendChild(element);
+                appendMessage(e.user.name + ': ' + e.message);
             });
     }
 </script>
@@ -111,17 +122,15 @@
     });
 </script>
 
-<script type="module">
-    function greetUser(id) {
-        window.axios.post('/chat/greet/' + id);
+<script>
+    window.onload = function () {
+        Echo.private('chat.greet.{{ auth()->user()->id }}')
+            .listen('GreetingSent', (e) => {
+                appendMessage(e.message);
+                const element = document.getElementById('{{ auth()->user()->id }}');
+                if (element) {
+                    element.click();
+                }
+            });
     }
-</script>
-<script type="module">
-    Echo.private('chat.greet.{{ auth()->user()->id }}')
-        .listen('GreetingSent', (e) => {
-            let element = document.createElement('li');
-            element.innerText = e.message;
-            element.classList.add('text-success');
-            messagesElement.appendChild(element);
-        });
 </script>
